@@ -1,0 +1,21 @@
+<configure
+ xmlns="http://namespaces.zope.org/zope"
+ xmlns:zojax="http://namespaces.zope.org/zojax"
+ i18n_domain="zojax.feedback">
+  
+  <zojax:product
+   name="zojax-feedback"
+   title="Feedback Form"
+   description="Simple form to send feedback to site administration."
+   schema=".interfaces.IFeedbackProduct"
+   configurable="true"/>
+  
+  <registerIn
+   registry="zojax.product.zojax-feedback">
+
+    <include package=".browser"/>
+    
+  </registerIn>
+  
+  
+</configure>

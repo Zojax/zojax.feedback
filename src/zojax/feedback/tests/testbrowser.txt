@@ -1,0 +1,77 @@
+=============
+Feedback Form
+=============
+
+    >>> import logging, sys
+    >>> from zope import component
+    >>> from zope.testbrowser.testing import Browser
+
+    >>> logger = logging.getLogger('zojax.mail')
+    >>> logger.addHandler(logging.StreamHandler(sys.stdout))
+    >>> logger.setLevel(logging.INFO)
+
+    >>> admin = Browser()
+    >>> admin.addHeader("Authorization", "Basic mgr:mgrpw")
+    >>> admin.handleErrors = False
+
+    >>> user = Browser()
+    >>> user.addHeader("Authorization", "Basic user:userpw")
+    >>> user.handleErrors = False
+
+
+Install product
+
+    >>> admin.open("http://localhost/settings/")
+    >>> admin.getLink('Products management').click()
+    >>> admin.getControl(name='availproducts:list').value = ['zojax-feedback']
+    >>> admin.getControl(name='install').click()
+
+Configure product
+
+    >>> admin.open("http://localhost/settings/product/zojax-feedback/")
+    >>> admin.getControl("Send Feedback To").value = "manager@example.com"
+    >>> admin.getControl("Save").click()
+
+Enable logging for outgoing emails
+
+    >>> admin.open("http://localhost/settings/system/mail/debug")
+    >>> admin.getControl(name="form.widgets.log_emails:list").controls[0].selected = True
+    >>> admin.getControl("Save").click();
+    
+
+Open form
+
+    >>> user.open("http://localhost/feedback")
+    >>> user.getControl("Your Name").value = "Foo"
+    >>> user.getControl("Your Email").value = "foo@example.com"
+    >>> user.getControl("Subject").value = "Spam"
+    >>> user.getControl("Message Text").value = "Ham"
+    >>> user.getControl("Send").click()
+    (u'manager@example.com',)
+    Content-Type: text/html; charset="utf-8"
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: base64
+    Subject: [Feedback from http://localhost] Spam
+    Date: ...
+    Message-ID:
+    X-mailer: zojax.mailer
+    From: Portal administrator <portal@zojax.net>
+    <BLANKLINE>
+    SGFtCgotLQpGb28gPGZvb0BleGFtcGxlLmNvbT4K
+    <BLANKLINE> 
+           
+    >>> user.url
+    'http://localhost'
+    >>> "Thank you. Your message was sent." in user.contents
+    True
+    
+
+
+Unistall product
+----------------
+
+    >>> admin.open("http://localhost/settings/")
+    >>> admin.getLink('Products management').click()
+    >>> admin.getControl(name='products:list').value = ['zojax-feedback']
+    >>> admin.getControl(name='uninstall').click()
+

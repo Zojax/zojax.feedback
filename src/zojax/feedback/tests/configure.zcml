@@ -1,0 +1,10 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:zojax="http://namespaces.zope.org/zojax">
+
+  <interface
+     name="DefaultSkin"
+     interface=".tests.IDefaultSkin"
+     type="zope.publisher.interfaces.browser.IBrowserSkinType" />
+
+</configure>

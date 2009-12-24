@@ -1,0 +1,4 @@
+<tal:block content="view/text" />
+
+--
+<tal:block content="view/name" /> &lt;<tal:block content="view/email" />&gt;

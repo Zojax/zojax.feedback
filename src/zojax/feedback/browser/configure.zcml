@@ -1,0 +1,20 @@
+<configure
+ xmlns="http://namespaces.zope.org/zope"
+ xmlns:browser="http://namespaces.zope.org/browser"
+ xmlns:zojax="http://namespaces.zope.org/zojax"
+ i18n_domain="zojax.feedback">
+
+  <zojax:pagelet
+     name="feedback"
+     for="zojax.portal.interfaces.IPortal"
+     class=".form.FeedbackForm"
+     permission="zope.Public" />
+
+  <zojax:mailtemplate
+     for="*"
+     contentType="text/html"
+     name="zojax.feedback.message"
+     template="message.pt"
+     />
+
+</configure>
