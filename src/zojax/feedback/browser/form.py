@@ -1,6 +1,6 @@
 from zope import interface, schema, component
 from zope.app.component.hooks import getSite
-from zope.app import zapi
+from zope.traversing.browser import absoluteURL
 from z3c.form.button import buttonAndHandler
 from z3c.schema.email.field import RFC822MailAddress
 from zojax.layoutform.form import PageletForm
@@ -42,7 +42,7 @@ class FeedbackForm(PageletForm):
             if not sendTo:
                 IStatusMessage(self.request).add(_('Unable to send your message. Please try again later.'), 'warning')
                 return
-            siteURL = zapi.absoluteURL(getSite(), self.request)
+            siteURL = absoluteURL(getSite(), self.request)
             mailTemplate = component.queryMultiAdapter((self, self.request), IMailTemplate, name="zojax.feedback.message")
             data['subject'] = u"[Feedback from %s] %s" % (siteURL, data['subject'])
             mailTemplate.send((sendTo,), **data)
