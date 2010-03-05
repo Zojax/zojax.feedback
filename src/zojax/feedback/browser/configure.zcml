@@ -6,7 +6,7 @@
 
   <zojax:pagelet
      name="feedback"
-     for="zojax.portal.interfaces.IPortal"
+     for="zope.app.component.interfaces.ISite"
      class=".form.FeedbackForm"
      permission="zope.Public" />
 

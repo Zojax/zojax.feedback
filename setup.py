@@ -41,7 +41,6 @@ setup(name='zojax.feedback',
             'z3c.form',
             
             'zojax.product',
-            'zojax.portal',
             'zojax.layoutform',
             'zojax.statusmessage',
             'zojax.mail',
