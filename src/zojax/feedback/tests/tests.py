@@ -11,29 +11,104 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-import doctest
-""" zojax.formulator tests
+"""
 
 $Id$
 """
-import os, unittest
-from zope.app.testing import functional
+import unittest, os.path
+from zojax.content.space.content import ContentSpace
+from zojax.layoutform.interfaces import ILayoutFormLayer
+from zope import event
 from zope.app.rotterdam import Rotterdam
+from zope.lifecycleevent import ObjectCreatedEvent
+from zope.testing import doctest
+import zope.app.testing.functional
+from zope.app.intid import IntIds
+from zope.app.intid.interfaces import IIntIds
+from zope.app.testing.functional import getRootFolder
+from zojax.catalog.catalog import Catalog, ICatalog
+from zojax.personal.space.manager import PersonalSpaceManager, IPersonalSpaceManager
+
+ZCMLLayer = zope.app.testing.functional.ZCMLLayer
+FunctionalTestSetup = zope.app.testing.functional.FunctionalTestSetup
 
 
-zojaxFeedbackLayer = functional.ZCMLLayer(
+class IDefaultSkin(ILayoutFormLayer, Rotterdam):
+    """ skin """
+
+
+zojaxFeedbackLayer = ZCMLLayer(
     os.path.join(os.path.split(__file__)[0], 'ftesting.zcml'),
     __name__, 'zojaxFeedbackLayer', allow_teardown=True)
 
 
-class IDefaultSkin(Rotterdam):
-    """ skin """
+
+
+def setUp(test):
+    root = getRootFolder()
+    root['intids'] = IntIds()
+    root['intids'].register(root)
+    root.getSiteManager().registerUtility(root['intids'], IIntIds)
+
+    catalog = Catalog()
+    root['catalog'] = catalog
+    root.getSiteManager().registerUtility(root['catalog'], ICatalog)
+
+    manager = PersonalSpaceManager()
+    root['people'] = manager
+    root.getSiteManager().registerUtility(root['people'], IPersonalSpaceManager)
+
+    space = ContentSpace(title=u'Space')
+    event.notify(ObjectCreatedEvent(space))
+    root['space'] = space
+
+
+def FunctionalDocFileSuite(*paths, **kw):
+    if 'layer' in kw:
+        layer = kw['layer']
+        del kw['layer']
+    else:
+        layer = zope.app.testing.functional.Functional
+
+    globs = kw.setdefault('globs', {})
+    globs['http'] = zope.app.testing.functional.HTTPCaller()
+    globs['getRootFolder'] = zope.app.testing.functional.getRootFolder
+    globs['sync'] = zope.app.testing.functional.sync
+
+    kw['package'] = doctest._normalize_module(kw.get('package'))
+
+    kwsetUp = kw.get('setUp')
+
+    def setUp(test):
+        FunctionalTestSetup().setUp()
+
+        if kwsetUp is not None:
+            kwsetUp(test)
+
+    kw['setUp'] = setUp
+
+    kwtearDown = kw.get('tearDown')
+
+    def tearDown(test):
+        if kwtearDown is not None:
+            kwtearDown(test)
+        FunctionalTestSetup().tearDown()
+
+    kw['tearDown'] = tearDown
+
+    if 'optionflags' not in kw:
+        old = doctest.set_unittest_reportflags(0)
+        doctest.set_unittest_reportflags(old)
+        kw['optionflags'] = (old
+                             | doctest.ELLIPSIS
+                             | doctest.NORMALIZE_WHITESPACE)
+
+    suite = doctest.DocFileSuite(*paths, **kw)
+    suite.layer = layer
+    return suite
 
 
 def test_suite():
-    test = functional.FunctionalDocFileSuite(
-        "testbrowser.txt",
-        optionflags=doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
-    test.layer = zojaxFeedbackLayer
-
-    return unittest.TestSuite((test,))
+    return unittest.TestSuite((
+        FunctionalDocFileSuite(
+            './testbrowser.txt', setUp=setUp, layer=zojaxFeedbackLayer),))

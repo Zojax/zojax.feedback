@@ -1,13 +1,19 @@
 <configure
    xmlns="http://namespaces.zope.org/zope"
    xmlns:browser="http://namespaces.zope.org/browser"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
    i18n_domain="zojax.feedback">
 
+  <exclude package="zope.app.securitypolicy.browser" />
   <include package="zojax.autoinclude" file="meta.zcml" />
   <includeAllDependencies package="zojax.feedback" extras="test" />
 
-  <includeOverrides package="zojax.feedback.tests" />
-  <includeOverrides package="zojax.feedback.tests" file="overrides.zcml" />
+  <interface
+     name="DefaultSkin"
+     interface="zojax.feedback.tests.tests.IDefaultSkin"
+     type="zope.publisher.interfaces.browser.IBrowserSkinType" />
+
+  <browser:defaultSkin name="DefaultSkin" />
 
   <securityPolicy
       component="zojax.security.securitypolicy.SecurityPolicy" />
@@ -40,11 +46,6 @@
       title="User"
       login="user"
       password="userpw" />
-
-  <everybodyGroup
-      id="zope.Everybody"
-      title="All Users"
-      />
 
   <grant role="zope.Manager" principal="zope.mgr" />
 
