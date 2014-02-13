@@ -54,6 +54,7 @@ setup(name='zojax.feedback',
                                   'zope.testbrowser',
                                   'zope.securitypolicy',
                                   'zojax.autoinclude',
+                                  'zojax.content.space',
                                   ]),
       entry_points="""
       # -*- Entry points: -*-

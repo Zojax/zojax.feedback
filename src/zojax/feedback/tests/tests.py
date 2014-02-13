@@ -41,26 +41,11 @@ zojaxFeedbackLayer = ZCMLLayer(
     os.path.join(os.path.split(__file__)[0], 'ftesting.zcml'),
     __name__, 'zojaxFeedbackLayer', allow_teardown=True)
 
-
-
-
 def setUp(test):
     root = getRootFolder()
     root['intids'] = IntIds()
     root['intids'].register(root)
     root.getSiteManager().registerUtility(root['intids'], IIntIds)
-
-    catalog = Catalog()
-    root['catalog'] = catalog
-    root.getSiteManager().registerUtility(root['catalog'], ICatalog)
-
-    manager = PersonalSpaceManager()
-    root['people'] = manager
-    root.getSiteManager().registerUtility(root['people'], IPersonalSpaceManager)
-
-    space = ContentSpace(title=u'Space')
-    event.notify(ObjectCreatedEvent(space))
-    root['space'] = space
 
 
 def FunctionalDocFileSuite(*paths, **kw):
