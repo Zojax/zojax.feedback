@@ -62,9 +62,7 @@ Open form
            
     >>> user.url
     'http://localhost'
-    >>> "Thank you. Your message was sent." in user.contents
-    True
-    
+
 
 
 Unistall product
